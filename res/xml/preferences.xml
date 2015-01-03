@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="@string/settings1" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="stream_audio"
+            android:summary="@string/settings2"
+            android:title="@string/settings1" />
+
+        <ListPreference
+            android:entries="@array/audioEncoderArray"
+            android:entryValues="@array/audioEncoderValues"
+            android:key="audio_encoder"
+            android:summary="@string/settings4"
+            android:title="@string/settings3" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="@string/settings5">
+        <ListPreference
+            android:entries="@array/videoEncoderArray"
+            android:entryValues="@array/videoEncoderValues"
+            android:key="video_encoder"
+            android:summary="@string/settings7"
+            android:title="@string/settings6" />
+        <ListPreference
+            android:entries="@array/videoResolutionArray"
+            android:entryValues="@array/videoResolutionArray"
+            android:key="video_resolution"
+            android:title="@string/settings8" />
+        <ListPreference
+            android:entries="@array/videoFramerateArray"
+            android:entryValues="@array/videoFramerateValues"
+            android:key="video_framerate"
+            android:title="@string/settings9" />
+        <ListPreference
+            android:entries="@array/videoBitrateArray"
+            android:entryValues="@array/videoBitrateValues"
+            android:key="video_bitrate"
+            android:title="@string/settings10" />
+    </PreferenceCategory>
+	<PreferenceCategory android:title="@string/settings11" >
+	    	<EditTextPreference
+            android:inputType="text"
+            android:key="server_ip"
+            android:summary="@string/settings12_1"
+            android:title="@string/settings12" />
+	    	<EditTextPreference
+            android:defaultValue="8080"
+            android:inputType="number"
+            android:key="server_port"
+            android:summary="@string/settings13_1"
+            android:title="@string/settings13" />
+	    	<EditTextPreference
+            android:defaultValue="8086"
+            android:inputType="number"
+            android:key="rtsp_port"
+            android:summary="@string/settings14_1"
+            android:title="@string/settings14" />
+    </PreferenceCategory>
+    
+	<PreferenceCategory android:title="@string/settings15" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="notification_enabled"
+            android:summary="@string/settings17"
+            android:title="@string/settings16" />
+    </PreferenceCategory>
+	
+</PreferenceScreen>

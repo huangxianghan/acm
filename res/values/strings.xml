@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">手机视频现场监控</string>
+    <string name="options_activity_title">程序设置</string>
+    <string name="action_settings">设置</string>
+    <string name="user_name">帐号:</string>
+    <string name="password">密码:</string>
+    <string name="login_server">登入</string>
+    <string name="exit_app">退出</string>
+	<string name="settings1">声音流</string>
+	<string name="settings2">是否开启音频传输</string>
+	<string name="settings3">音频编码设置</string>
+	<string name="settings4">选择一个编码器</string>
+	<string name="settings5">视频设置</string>
+	<string name="settings6">视频编码器</string>
+	<string name="settings7">有两个视频编码器可用：H.263和H.264</string>
+    <string name="settings8">分辨率</string>
+    <string name="settings8_1">当前分辨率</string>
+    <string name="settings9">帧速率</string>
+    <string name="settings9_1">当前帧速率</string>
+    <string name="settings10">比特率</string>
+    <string name="settings10_1">当前比特率</string>
+    <string name="settings11">网络设置</string>
+    <string name="settings12">服务器Ip</string>
+    <string name="settings12_1">设置登入服务器Ip</string>
+    <string name="settings13">服务器端口</string>
+    <string name="settings13_1">设置登入服务器端口</string>
+    <string name="settings14">Rtsp端口</string>
+    <string name="settings14_1">设置Rtsp传输端口</string>
+    <string name="settings15">更多设置</string>
+    <string name="settings16">通知</string>
+    <string name="settings17">启用或禁用通知</string>
+    <string name="camera_preview">摄像头预览</string>
+    <string name="bind_failed">你需要选择另一个 %s 服务器端口 !</string>
+    <string name="port_used">端口己经被使用 !</string>
+	<string name="error">错误</string>
+</resources>
