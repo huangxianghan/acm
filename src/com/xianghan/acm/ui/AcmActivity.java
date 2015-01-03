@@ -7,6 +7,7 @@ import com.xianghan.acm.websocket.WebsocketService.WSBinder;
 
 import android.support.v7.app.ActionBarActivity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -42,15 +43,14 @@ public class AcmActivity extends ActionBarActivity {
         setContentView(R.layout.activity_acm);
         //mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         loginButtonOnClickEventHandle();
-        //startService(new Intent(this,WebsocketService.class));
+        startService(new Intent(this,WebsocketService.class));
     }
 
 
     @Override
 	protected void onStart() {
 		super.onStart();
-		start();
-		//bindService(new Intent(this,WebsocketService.class), mWebsocketServiceConnection, Context.BIND_AUTO_CREATE);
+		bindService(new Intent(this,WebsocketService.class), mWebsocketServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 
@@ -93,9 +93,9 @@ public class AcmActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				EditText user = (EditText)AcmActivity.this.findViewById(R.id.editUserName);
 				EditText pass = (EditText)AcmActivity.this.findViewById(R.id.editPassword);
-				/*if(mWebsocketService!=null){
+				if(mWebsocketService!=null){
 					mWebsocketService.login(user.getText().toString(), pass.getText().toString(), mReconnect);
-				}*/
+				}
 				
 				
 			}
@@ -150,8 +150,5 @@ public class AcmActivity extends ActionBarActivity {
 		}
 	};
 	
-	private void start(){
-		String wsUri = "ws://192.168.1.101:8080/CmAppServer/androidwebsocket";
-		
-	}
+	
 }

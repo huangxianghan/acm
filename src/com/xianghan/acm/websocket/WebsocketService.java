@@ -9,6 +9,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.java_websocket.drafts.Draft_17;
 
+
 import com.google.gson.Gson;
 
 import android.app.Service;
@@ -32,7 +33,7 @@ public class WebsocketService extends Service implements AcmWebsocketClient.AcmM
 	
 	protected SharedPreferences mSharedPreferences;
 	protected String mProtocol = "ws";
-	protected String mServer = "192.168.1.100";
+	protected String mServer = "192.168.1.101";
 	protected int mPort = 8080;
 	protected String mRtspPort = "8086";
 	protected String mPath = "/CmAppServer/androidwebsocket";
@@ -172,7 +173,7 @@ public class WebsocketService extends Service implements AcmWebsocketClient.AcmM
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-			
+		mWebsocketClient.send(json);
 		
 		if(DEBUG) Log.d(TAG,"发送:"+json);
 		
