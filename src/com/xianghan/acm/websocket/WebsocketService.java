@@ -2,10 +2,12 @@ package com.xianghan.acm.websocket;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.java_websocket.drafts.Draft_17;
 
 import com.google.gson.Gson;
 
@@ -14,11 +16,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class WebsocketService extends Service  {
+public class WebsocketService extends Service implements AcmWebsocketClient.AcmMessageCallback  {
 
 	public final static boolean DEBUG = true;
 	public final static String TAG = WebsocketService.class.getName();
@@ -36,13 +40,11 @@ public class WebsocketService extends Service  {
 	
 	private final IBinder mBinder = new WSBinder();
 	
+	private AcmWebsocketClient mWebsocketClient;
 	
+	private final LinkedList<Handler> mConnectionHandlers = new LinkedList<Handler>();
+	private final LinkedList<Handler> mMessageHandlers = new LinkedList<Handler>();
 	
-	private final LinkedList<WebsocketServiceCallbackListener> mListeners = new LinkedList<WebsocketServiceCallbackListener>();
-	
-	public interface WebsocketServiceCallbackListener{
-		public void onMessage( AppMessage message );
-	}
 
 	public class WSBinder extends Binder{
 		public WebsocketService getService(){
@@ -109,30 +111,39 @@ public class WebsocketService extends Service  {
 	};
 	
 	
-	public void addCallbackListener(WebsocketServiceCallbackListener listener) {
-		synchronized (mListeners) {
-			if (mListeners.size() > 0) {
-				for (WebsocketServiceCallbackListener cl : mListeners) {
-					if (cl == listener) return;
+	public void addMessageHandler(Handler handler) {
+		synchronized (mMessageHandlers) {
+			if (mMessageHandlers.size() > 0) {
+				for (Handler cl : mMessageHandlers) {
+					if (cl == handler) return;
 				}
 			}
-			mListeners.add(listener);			
+			mMessageHandlers.add(handler);			
 		}
 	}
 	
-	public void removeCallbackListener(WebsocketServiceCallbackListener listener) {
-		synchronized (mListeners) {
-			mListeners.remove(listener);				
+	public void removeMessageHandler(Handler handler) {
+		synchronized (mMessageHandlers) {
+			mMessageHandlers.remove(handler);				
 		}
 	}
 	
-	private void postMessage(AppMessage message){
-		synchronized (mListeners) {
-			if (mListeners.size() > 0) {
-				for (WebsocketServiceCallbackListener cl : mListeners) {
-					cl.onMessage(message);
+	
+	public void addConnectionHandlers(Handler handler){
+		synchronized (mConnectionHandlers) {
+			if (mConnectionHandlers.size() > 0) {
+				for (Handler cl : mConnectionHandlers) {
+					if (cl == handler) return;
 				}
-			}			
+			}
+			mConnectionHandlers.add(handler);
+		}
+	}
+	
+	
+	public void removeConnectionHandlers(Handler handler){
+		synchronized(mConnectionHandlers){
+			mConnectionHandlers.remove(handler);
 		}
 	}
 	
@@ -170,7 +181,9 @@ public class WebsocketService extends Service  {
 	protected void start(){
 		if(mRestart) stop();
 		
-		
+		mWebsocketClient = new AcmWebsocketClient(getWsuri(), new Draft_17());
+		//mWebsocketClient.setMessageCallback(this);
+		mWebsocketClient.connect();
 		
 		mRestart = false;
 	}
@@ -179,8 +192,37 @@ public class WebsocketService extends Service  {
 		
 	}
 	
-	private String getWsuri(){
-		return mProtocol + "://"+mServer+":"+mPort+mPath;
+	private URI getWsuri(){
+		try {
+			return new URI( mProtocol + "://"+mServer+":"+mPort+mPath);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public void onOpen(short httpStatus, String httpStatusMessage) {
+		Message msg = new Message();
+		
+		for(Handler h : mConnectionHandlers){
+			h.sendMessage(msg);
+		}
+	}
+
+	@Override
+	public void onMessage(String msg) {
+		
+	}
+
+	@Override
+	public void onError(Exception ex) {
+		
+	}
+
+	@Override
+	public void onClose(int code, String reason) {
+		
 	}
 
 	

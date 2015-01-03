@@ -4,7 +4,6 @@ import com.xianghan.acm.R;
 import com.xianghan.acm.websocket.AppMessage;
 import com.xianghan.acm.websocket.WebsocketService;
 import com.xianghan.acm.websocket.WebsocketService.WSBinder;
-import com.xianghan.acm.websocket.WebsocketService.WebsocketServiceCallbackListener;
 
 import android.support.v7.app.ActionBarActivity;
 import android.content.ComponentName;
@@ -58,8 +57,10 @@ public class AcmActivity extends ActionBarActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if(mWebsocketService!=null) 
-			mWebsocketService.removeCallbackListener(mWebsocketServiceCallbackListener);
+		if(mWebsocketService!=null) {
+			mWebsocketService.removeMessageHandler(mMessageHander);
+			mWebsocketService.removeConnectionHandlers(mConnectionHander);
+		}
 		unbindService(mWebsocketServiceConnection);
 	}
 
@@ -101,6 +102,15 @@ public class AcmActivity extends ActionBarActivity {
 		});
     }
     
+    Handler mMessageHander = new Handler(){
+    	
+    };
+    
+    Handler mConnectionHander = new Handler(){
+    	
+    };
+    
+    
     Handler loginHandler = new Handler(){
 
 		@Override
@@ -135,18 +145,10 @@ public class AcmActivity extends ActionBarActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mWebsocketService = ((WSBinder)service).getService();
-			mWebsocketService.addCallbackListener(mWebsocketServiceCallbackListener);
+			mWebsocketService.addMessageHandler(mMessageHander);
+			mWebsocketService.addConnectionHandlers(mConnectionHander);
 		}
 	};
-	
-	WebsocketServiceCallbackListener mWebsocketServiceCallbackListener = new WebsocketServiceCallbackListener() {
-		
-		@Override
-		public void onMessage(AppMessage message) {
-			if(DEBUG) Log.d(TAG, "code:" +message.getC());
-		}
-	};
-    
 	
 	private void start(){
 		String wsUri = "ws://192.168.1.101:8080/CmAppServer/androidwebsocket";
