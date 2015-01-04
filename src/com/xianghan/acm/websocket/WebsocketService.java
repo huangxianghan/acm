@@ -3,6 +3,7 @@ package com.xianghan.acm.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -10,13 +11,12 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.java_websocket.drafts.Draft_17;
 
 
-import com.google.gson.Gson;
-
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -40,7 +40,6 @@ public class WebsocketService extends Service implements AcmWebsocketClient.AcmM
 	protected boolean mRestart = false;
 	
 	private final IBinder mBinder = new WSBinder();
-	
 	private AcmWebsocketClient mWebsocketClient;
 	
 	private final LinkedList<Handler> mConnectionHandlers = new LinkedList<Handler>();
@@ -182,15 +181,20 @@ public class WebsocketService extends Service implements AcmWebsocketClient.AcmM
 	protected void start(){
 		if(mRestart) stop();
 		
-		mWebsocketClient = new AcmWebsocketClient(getWsuri(), new Draft_17());
-		//mWebsocketClient.setMessageCallback(this);
-		mWebsocketClient.connect();
+		if(mWebsocketClient==null){
+			mWebsocketClient = new AcmWebsocketClient(getWsuri(), new Draft_17());
+			mWebsocketClient.setMessageCallback(this);
+			mWebsocketClient.connect();
+		}
 		
 		mRestart = false;
 	}
 	
 	protected void stop(){
-		
+		if(mWebsocketClient!=null){
+			mWebsocketClient.close();
+			mWebsocketClient = null;
+		}
 	}
 	
 	private URI getWsuri(){
@@ -204,29 +208,72 @@ public class WebsocketService extends Service implements AcmWebsocketClient.AcmM
 
 	@Override
 	public void onOpen(short httpStatus, String httpStatusMessage) {
-		Message msg = new Message();
+		if(DEBUG) Log.d(TAG,"httpStatus: "+httpStatus 
+				+ " message: "+httpStatusMessage);
+		Bundle data= new Bundle();
+		data.putInt("c", 1);
+		data.putShort("httpStatus", httpStatus);
+		data.putString("httpStatusMessage", httpStatusMessage);
+		postConnectionHandlerMessage(data);
+	}
+
+	@Override
+	public void onMessage(String payload) {
+		if(DEBUG) Log.d(TAG,payload);
 		
-		for(Handler h : mConnectionHandlers){
+		AppMessage amsg = AppMessage.fromJson(payload);
+		if(amsg == null) return;
+		
+		int c = amsg.getC();
+		int v = amsg.getV();
+		
+		Bundle data = new Bundle();
+		data.putInt("v", v);
+		data.putInt("c", c);
+		
+		if(c==AppMessage.LOGIN_SUCCESS){
+			data.putString("d", payload);
+		}else if(c == AppMessage.LOGIN_FAIL){
+			data.putString("d", amsg.getD(String.class));
+		}else{
+			data.putString("d", amsg.getD(String.class));
+		}
+		
+		Message msg = new Message();
+		msg.setData(data);
+		for(Handler h:mMessageHandlers){
 			h.sendMessage(msg);
 		}
 	}
 
 	@Override
-	public void onMessage(String msg) {
-		
-	}
-
-	@Override
 	public void onError(Exception ex) {
-		
+		if(DEBUG) Log.d(TAG,ex.getMessage());
+		Bundle data= new Bundle();
+		data.putInt("c", 2);
+		data.putString("ex", ex.toString());
+		postConnectionHandlerMessage(data);
 	}
 
 	@Override
 	public void onClose(int code, String reason) {
-		
+		if(DEBUG) Log.d(TAG,"webscoket close code:"
+				+code + " reason:" + reason );
+		Bundle data= new Bundle();
+		data.putInt("c", 3);
+		data.putInt("code", code);
+		data.putString("reason", reason);
+		postConnectionHandlerMessage(data);
 	}
 
-	
+	private void postConnectionHandlerMessage(Bundle data){
+		if(data == null) return;
+		Message msg = new Message();
+		msg.setData(data);
+		for(Handler h : mConnectionHandlers){
+			h.sendMessage(msg);
+		}
+	}
 
 }
 

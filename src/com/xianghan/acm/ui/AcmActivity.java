@@ -103,35 +103,17 @@ public class AcmActivity extends ActionBarActivity {
     }
     
     Handler mMessageHander = new Handler(){
-    	
-    };
-    
-    Handler mConnectionHander = new Handler(){
-    	
-    };
-    
-    
-    Handler loginHandler = new Handler(){
-
-		@Override
+    	@Override
 		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
 			Bundle data = msg.getData();
-			String val = data.getString("value");
-			if(val.equals("ok")){
+			if(data.getInt("c") == AppMessage.LOGIN_SUCCESS){
 				Intent i = new Intent(AcmActivity.this, PreviewActivity.class);
 				startActivity(i);
 			}
 		}
     };
     
-    Runnable runnable = new Runnable(){
-
-		@Override
-		public void run() {
-			EditText user = (EditText)AcmActivity.this.findViewById(R.id.editUserName);
-			EditText pass =  (EditText)AcmActivity.this.findViewById(R.id.editPassword);
-		}
+    Handler mConnectionHander = new Handler(){
     	
     };
     

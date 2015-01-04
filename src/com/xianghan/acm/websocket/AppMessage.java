@@ -7,6 +7,8 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
+import android.os.Bundle;
+
 import com.xianghan.acm.utils.JacksonMapper;
 
 /**
@@ -74,9 +76,14 @@ public class AppMessage {
 		this.d = d;
 	}
 
-	public static AppMessage fromJson(String json)
-	throws JsonParseException, JsonMappingException, IOException{
-		return JacksonMapper.getInstance().readValue(json, AppMessage.class);
+	public static AppMessage fromJson(String json){
+		try {
+			return JacksonMapper.getInstance().readValue(json, AppMessage.class);
+		} catch (JsonParseException e) {
+		} catch (JsonMappingException e) {
+		} catch (IOException e) {
+		}
+		return null;
 	}
 	
 	public String toJson() throws JsonGenerationException, JsonMappingException, IOException{
@@ -84,4 +91,7 @@ public class AppMessage {
 		JacksonMapper.getInstance().writeValue(sw, this);
 		return sw.toString();
 	} 
+	
+	
+	
 }
